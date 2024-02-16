@@ -1,19 +1,37 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
-const cheerio = require('cheerio');
 
 const targetUrl = 'https://boosty.to/ja.stuff';
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
 let boostyCookies = config['boostyCookies'];
 boostyCookies = readCookie(boostyCookies, targetUrl);
 
+const Parser = require('./lib/Parser');
+
 async function startCrawler(){
-    const browser = await puppeteer.launch({args: ['--window-size=1920,1080']});
+    const browser = await puppeteer.launch({ headless: true, args: ['--window-size=1920,1080']});
     const page = await browser.newPage();
+    await page.setDefaultTimeout(0);
     await page.setCookie(...boostyCookies);
-    await page.goto(targetUrl);
+    await page.goto(targetUrl, {waitUntil: 'load', timeout: 0});
     await page.setViewport({ width: 1920, height: 1080 });
-    await page.screenshot({ path: `./scrapingbee_homepage.jpg` });
+    await autoScroll(page);
+
+    let pageContent = await page.evaluate(() => {
+        return document.querySelector('*').outerHTML;
+    });
+
+    //If page had load more button, keep loading
+    if(Parser.checkHadLoadMore(pageContent)){
+        await page.click('.Feed_center_oGu8f .BaseButton_button_yO8r5');
+        await autoScroll(page);
+        pageContent = await page.evaluate(() => {
+            return document.querySelector('*').outerHTML;
+        });
+    }
+    
+    const postUrls = Parser.getPostUrls(pageContent);
+
     await browser.close();
 }
 
@@ -46,6 +64,25 @@ function _getCookieArray(cookiesObj, targetUrl){
         cookies.push(cookie);
     }
     return cookies;
+}
+
+async function autoScroll(page){
+    await page.evaluate(async () => {
+        await new Promise((resolve) => {
+            var totalHeight = 0;
+            var distance = 100;
+            var timer = setInterval(async () => {
+                var scrollHeight = document.body.scrollHeight;
+                window.scrollBy(0, distance);
+                totalHeight += distance;
+
+                if(totalHeight >= scrollHeight - window.innerHeight){
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, 300);
+        });
+    });
 }
 
 startCrawler();

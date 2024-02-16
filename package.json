@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "puppeteer": "^22.0.0",
+    "puppeteer": "19.7.5",
     "query-string": "^8.2.0"
   }
 }
