@@ -1,3 +1,4 @@
 *.jpg
 config.json
 node_modules
+posts.json

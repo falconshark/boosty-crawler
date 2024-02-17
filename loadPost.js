@@ -9,7 +9,8 @@ boostyCookies = readCookie(boostyCookies, targetUrl);
 const Parser = require('./lib/Parser');
 
 async function startCrawler(){
-    const browser = await puppeteer.launch({ headless: true, args: ['--window-size=1920,1080']});
+    console.log('Start getting post list.');
+    const browser = await puppeteer.launch({ headless: false, args: ['--window-size=1920,1080']});
     const page = await browser.newPage();
     await page.setDefaultTimeout(0);
     await page.setCookie(...boostyCookies);
@@ -29,9 +30,9 @@ async function startCrawler(){
             return document.querySelector('*').outerHTML;
         });
     }
-    
+    console.log('Getting post urls...');
     const postUrls = Parser.getPostUrls(pageContent);
-
+    fs.writeFileSync('posts.json', JSON.stringify(postUrls));
     await browser.close();
 }
 
@@ -51,7 +52,7 @@ function _cookieToObject(cookie) {
     return cookieObject;
 }
 
-function _getCookieArray(cookiesObj, targetUrl){
+function _getCookieArray(cookiesObj){
     const cookies = [];
     for(let i = 0; i < Object.keys(cookiesObj).length; i++){
         const key = Object.keys(cookiesObj)[i];
@@ -59,7 +60,7 @@ function _getCookieArray(cookiesObj, targetUrl){
         const cookie = {
             'name': key,
             'value': value,
-            'url': targetUrl
+            'domain': 'boosty.to'
         };
         cookies.push(cookie);
     }
