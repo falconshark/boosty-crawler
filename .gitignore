@@ -1,4 +1,8 @@
+.DS_Store
 *.jpg
 config.json
 node_modules
 posts.json
+*.png
+*.zip
+filetUrlBak.json
