@@ -1,8 +1,8 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 
-const targetUrl = 'https://boosty.to/ja.stuff';
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
+const targetUrl = config['boostyUrl'];
 let boostyCookies = config['boostyCookies'];
 boostyCookies = readCookie(boostyCookies, targetUrl);
 
@@ -33,6 +33,7 @@ async function startCrawler(){
     console.log('Getting post urls...');
     const postUrls = Parser.getPostUrls(pageContent);
     fs.writeFileSync('posts.json', JSON.stringify(postUrls));
+    console.log('Completed.');
     await browser.close();
 }
 

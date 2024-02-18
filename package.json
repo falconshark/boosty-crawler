@@ -2,8 +2,6 @@
   "dependencies": {
     "axios": "^1.6.7",
     "cheerio": "^1.0.0-rc.12",
-    "puppeteer": "19.7.5",
-    "query-string": "^8.2.0",
-    "request": "^2.88.2"
+    "puppeteer": "19.7.5"
   }
 }
