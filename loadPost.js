@@ -24,7 +24,7 @@ async function startCrawler(){
 
     //If page had load more button, keep loading
     if(Parser.checkHadLoadMore(pageContent)){
-        await page.click('.Feed_center_oGu8f .BaseButton_button_yO8r5');
+        await page.click('.Feed_center_dBcF0 .BaseButton_button_yO8r5');
         await autoScroll(page);
         pageContent = await page.evaluate(() => {
             return document.querySelector('*').outerHTML;
